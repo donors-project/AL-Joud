@@ -215,10 +215,7 @@ const Announcements = () => {
                   <div className="bg-[#AAB99A] p-4 relative">
                     <div className="bg-white rounded-lg p-4 mt-2 mb-6">
                       <p className="text-center font-medium text-gray-800">
-                        عليه أمر بالتنفيذ وحكم بالسجن بسبب {cardData.reason}{" "}
-                        عمره {cardData.id} عاما
-                        <br /> متبقي عليه مبلغ {remainingDebt.toLocaleString()}{" "}
-                        دينار
+                        {cardData.reason}
                       </p>
                     </div>
                     <div
@@ -244,13 +241,13 @@ const Announcements = () => {
                     <div className="text-right">
                       <p className="text-gray-500 mb-1">المبلغ المتبقي</p>
                       <p className="font-bold text-lg">
-                        د.أ {remainingDebt.toLocaleString()}
+                        د.أ {cardData.total_debt - cardData.remaining_debt}
                       </p>
                     </div>
                   </div>
                   <div className="flex p-4 gap-2">
                     <button
-                      className="bg-[#8da474] hover:bg-[#7c9364] text-white px-4 py-2 rounded-md w-1/3"
+                      className="bg-[#8da474] hover:cursor-pointer hover:bg-[#7c9364] text-white px-4 py-2 rounded-md w-1/3"
                       onClick={() => handleDonateClick(cardData.id)}
                     >
                       تبرع الآن
