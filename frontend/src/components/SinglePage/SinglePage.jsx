@@ -174,7 +174,9 @@ const SinglePage = () => {
             <div className="bg-gray-50 p-4 flex justify-between items-center">
               <div className="flex items-center">
                 <p className="text-lg font-bold">رقم الحالة:</p>
-                <p className="text-lg mr-2">{cardData.id}</p>
+                <p className="text-lg mr-2">
+                  {cardData.id + Math.random().toString().slice(2, 12)}
+                </p>
               </div>
             </div>
 
@@ -189,7 +191,9 @@ const SinglePage = () => {
                   <p className="text-xs mr-1 font-bold px-2 py-1 rounded">
                     د.أ
                   </p>
-                  <p className="text-lg font-bold">{cardData.remaining_debt}</p>
+                  <p className="text-lg font-bold">
+                    {Number(cardData.remaining_debt).toFixed()}
+                  </p>
                 </div>
               </div>
 
@@ -224,9 +228,15 @@ const SinglePage = () => {
             <div className="grid grid-cols-2 border-t border-gray-200">
               <div className="p-4 border-l border-gray-200">
                 <p className="text-[#7c9364] text-center font-bold mb-2">
-                  سبب الدين
+                  تم سد من الدين
                 </p>
-                <p className="text-center font-bold">{cardData.reason}</p>
+                <p className="text-center font-bold">
+                  %{" "}
+                  {(
+                    (cardData.remaining_debt / cardData.total_debt) *
+                    100
+                  ).toFixed()}
+                </p>
               </div>
 
               <div className="p-4">

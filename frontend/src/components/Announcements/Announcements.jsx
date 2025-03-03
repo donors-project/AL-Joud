@@ -64,14 +64,29 @@ const Announcements = () => {
     navigate(`/single-page/${id}`);
   };
 
-  const filteredCards = cardsData.filter((card) => {
+  // طريقة مختصرة لتوليد رقم فاتورة ثابت
+  const generateInvoiceNumber = (id) => {
+    // استخدام الـID والعمليات الحسابية البسيطة لتوليد رقم ثابت يبدو عشوائياً
+    const randomPart = (id * 73 + 19).toString().slice(0, 6);
+    return `${id}${randomPart}`;
+  };
+
+  // ثانياً: تعديل وظيفة البحث في الفلتر
+  let filteredCards = cardsData.filter((card) => {
+    if (!card.verified || card.total_debt - card.remaining_debt === 0) {
+      return false;
+    }
+
     const totalDebt = parseFloat(card.total_debt || 0);
     const remainingDebt = parseFloat(card.remaining_debt || 0);
     const collectionPercentage =
       Math.round((1 - remainingDebt / totalDebt) * 100) || 0;
 
+    // استخدام رقم الفاتورة الثابت المولد من الـ ID في البحث
+    const invoiceNumber = generateInvoiceNumber(card.id);
+
     const matchesSearch =
-      card.id.toString().includes(searchTerm) ||
+      invoiceNumber.includes(searchTerm) ||
       card.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
       card.remaining_debt.toString().includes(searchTerm);
 
@@ -147,7 +162,7 @@ const Announcements = () => {
               value={filterValue}
               onChange={(e) => setFilterValue(e.target.value)}
             >
-              <option value="all">جميع الحالات</option>
+              <option value="all">كل النسب </option>
               <option value="low">أقل من 50%</option>
               <option value="medium">بين 50% و 80%</option>
               <option value="high">أكثر من 80%</option>
@@ -228,14 +243,18 @@ const Announcements = () => {
                   </div>
                   <div className="flex justify-between items-center px-4 py-2 border-b">
                     <div className="text-gray-700">
-                      رقم الفاتورة: {cardData.id}
+                      رقم الفاتورة: {generateInvoiceNumber(cardData.id)}
                     </div>
                   </div>
                   <div className="flex justify-between items-center p-4">
                     <div className="text-right">
                       <p className="text-gray-500 mb-1">تم جمع</p>
                       <p className="font-bold text-lg">
-                        % {collectionPercentage}
+                        %{" "}
+                        {(
+                          (cardData.remaining_debt / cardData.total_debt) *
+                          100
+                        ).toFixed()}
                       </p>
                     </div>
                     <div className="text-right">
