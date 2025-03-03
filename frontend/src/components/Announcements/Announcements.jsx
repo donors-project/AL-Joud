@@ -4,6 +4,8 @@ import { FaHandHoldingUsd, FaHandshake } from "react-icons/fa";
 import { MdOutlineVolunteerActivism } from "react-icons/md";
 import { GiOpenBook } from "react-icons/gi";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const buttons = [
   {
@@ -64,14 +66,29 @@ const Announcements = () => {
     navigate(`/single-page/${id}`);
   };
 
-  const filteredCards = cardsData.filter((card) => {
+  // طريقة مختصرة لتوليد رقم فاتورة ثابت
+  const generateInvoiceNumber = (id) => {
+    // استخدام الـID والعمليات الحسابية البسيطة لتوليد رقم ثابت يبدو عشوائياً
+    const randomPart = (id * 73 + 19).toString().slice(0, 6);
+    return `${id}${randomPart}`;
+  };
+
+  // ثانياً: تعديل وظيفة البحث في الفلتر
+  let filteredCards = cardsData.filter((card) => {
+    if (!card.verified || card.total_debt - card.remaining_debt === 0) {
+      return false;
+    }
+
     const totalDebt = parseFloat(card.total_debt || 0);
     const remainingDebt = parseFloat(card.remaining_debt || 0);
     const collectionPercentage =
       Math.round((1 - remainingDebt / totalDebt) * 100) || 0;
 
+    // استخدام رقم الفاتورة الثابت المولد من الـ ID في البحث
+    const invoiceNumber = generateInvoiceNumber(card.id);
+
     const matchesSearch =
-      card.id.toString().includes(searchTerm) ||
+      invoiceNumber.includes(searchTerm) ||
       card.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
       card.remaining_debt.toString().includes(searchTerm);
 
@@ -95,10 +112,40 @@ const Announcements = () => {
 
   return (
     <div
-      className="p-6 w-full flex-col flex items-center justify-center bg-gray-100"
+      className=" w-full flex-col flex items-center justify-center bg-gray-100"
       dir="rtl"
     >
-      <div className="flex w-full justify-around space-x-6 rtl:space-x-reverse p-4">
+     <section className="bg-[#dfe8df] mb-5 py-16 px-6 w-full text-center">
+      <motion.h2 
+        className="text-3xl font-bold text-gray-800 mb-4"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        أبطال العطاء! 🏆 
+      </motion.h2>
+      <motion.p 
+        className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+      >
+        تعرف على الأشخاص الرائعين الذين ساهموا في تغيير حياة المحتاجين. كل تبرع يحدث فرقًا حقيقيًا!
+      </motion.p>
+      <motion.div 
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Link to="/top-donations">
+          <button className="bg-[#AAB99A] text-white px-6 py-3 text-lg font-semibold rounded-full hover:cursor-pointer shadow-md hover:bg-[#727D73] transition">
+            استكشف المتبرعين المميزين
+          </button>
+        </Link>
+      </motion.div>
+    </section>
+
+      <div className="flex flex-wrap gap-5 justify-center items-center w-full md:justify-around space-x-6 rtl:space-x-reverse p-4">
         {buttons.map((btn, index) => (
           <button
             key={index}
@@ -147,7 +194,7 @@ const Announcements = () => {
               value={filterValue}
               onChange={(e) => setFilterValue(e.target.value)}
             >
-              <option value="all">جميع الحالات</option>
+              <option value="all">كل النسب </option>
               <option value="low">أقل من 50%</option>
               <option value="medium">بين 50% و 80%</option>
               <option value="high">أكثر من 80%</option>
@@ -215,10 +262,7 @@ const Announcements = () => {
                   <div className="bg-[#AAB99A] p-4 relative">
                     <div className="bg-white rounded-lg p-4 mt-2 mb-6">
                       <p className="text-center font-medium text-gray-800">
-                        عليه أمر بالتنفيذ وحكم بالسجن بسبب {cardData.reason}{" "}
-                        عمره {cardData.id} عاما
-                        <br /> متبقي عليه مبلغ {remainingDebt.toLocaleString()}{" "}
-                        دينار
+                        {cardData.reason}
                       </p>
                     </div>
                     <div
@@ -231,26 +275,30 @@ const Announcements = () => {
                   </div>
                   <div className="flex justify-between items-center px-4 py-2 border-b">
                     <div className="text-gray-700">
-                      رقم الفاتورة: {cardData.id}
+                      رقم الفاتورة: {generateInvoiceNumber(cardData.id)}
                     </div>
                   </div>
                   <div className="flex justify-between items-center p-4">
                     <div className="text-right">
                       <p className="text-gray-500 mb-1">تم جمع</p>
                       <p className="font-bold text-lg">
-                        % {collectionPercentage}
+                        %{" "}
+                        {(
+                          (cardData.remaining_debt / cardData.total_debt) *
+                          100
+                        ).toFixed()}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="text-gray-500 mb-1">المبلغ المتبقي</p>
                       <p className="font-bold text-lg">
-                        د.أ {remainingDebt.toLocaleString()}
+                        د.أ {cardData.total_debt - cardData.remaining_debt}
                       </p>
                     </div>
                   </div>
                   <div className="flex p-4 gap-2">
                     <button
-                      className="bg-[#8da474] hover:bg-[#7c9364] text-white px-4 py-2 rounded-md w-1/3"
+                      className="bg-[#8da474] hover:cursor-pointer hover:bg-[#7c9364] text-white px-4 py-2 rounded-md w-1/3"
                       onClick={() => handleDonateClick(cardData.id)}
                     >
                       تبرع الآن
