@@ -11,13 +11,21 @@ const SinglePage = () => {
   const [error, setError] = useState(null);
   const [amount, setAmount] = useState("");
 
-  const dispatch = useDispatch(); // تعريف الـ dispatch
+  const dispatch = useDispatch();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleDonation = () => {
     // Dispatch المبلغ إلى Redux أو إجراء أي منطق آخر
     dispatch(setDonationAmount(amount));
 
-    // يمكنك أيضاً إضافة منطق آخر مثل إرسال البيانات إلى API
+    // Navigate to the payment page with the id and amount as state
+    navigate(`/payment`, {
+      state: {
+        id: cardId,
+        amount: amount,
+      },
+    });
+
     console.log("تم التبرع بالمبلغ:", amount);
   };
 
@@ -25,17 +33,13 @@ const SinglePage = () => {
     setAmount(value);
   };
 
-  // Method 1: Using useParams if you're using React Router
   const params = useParams();
-
-  // Method 2: Extract ID from the URL manually
   const getIdFromUrl = () => {
     const path = window.location.pathname;
     const pathSegments = path.split("/");
     return pathSegments[pathSegments.length - 1];
   };
 
-  // Use either the route param or extract from URL
   const cardId = params?.id || getIdFromUrl();
 
   useEffect(() => {
@@ -44,7 +48,6 @@ const SinglePage = () => {
         setLoading(true);
         console.log("Fetching data for ID:", cardId);
 
-        // Fetch data from API
         const response = await axios.get("http://localhost:5000/api/BFY");
 
         if (!response.data || !Array.isArray(response.data)) {
@@ -53,8 +56,6 @@ const SinglePage = () => {
 
         console.log("API Response:", response.data);
 
-        // Try both string and number comparison
-        // Some APIs return IDs as numbers, while URL params are strings
         const foundCard = response.data.find(
           (card) =>
             String(card.id) === String(cardId) ||
@@ -86,7 +87,6 @@ const SinglePage = () => {
     }
   }, [cardId]);
 
-  // لطباعة البيانات الكاملة للتصحيح
   useEffect(() => {
     console.log("Current card data:", cardData);
   }, [cardData]);
@@ -169,6 +169,7 @@ const SinglePage = () => {
             </div>
 
             {/* Progress bar */}
+            {/* Progress bar */}
 
             {/* Case number */}
             <div className="bg-gray-50 p-4 flex justify-between items-center">
@@ -211,7 +212,32 @@ const SinglePage = () => {
                   </p>
                 </div>
               </div>
+              {/* Amount required */}
+              <div className="p-4 border-l border-gray-200">
+                <p className="text-[#7c9364] text-center font-bold mb-2">
+                  المبلغ المتبقي
+                </p>
+                <div className="flex justify-center items-center">
+                  <p className="text-xs mr-1 font-bold px-2 py-1 rounded">
+                    د.أ
+                  </p>
+                  <p className="text-lg font-bold">
+                    {cardData.total_debt - cardData.remaining_debt}
+                  </p>
+                </div>
+              </div>
 
+              {/* Number of beneficiaries */}
+              <div className="p-4">
+                <p className="text-[#7c9364] text-center font-bold mb-2">
+                  عدد المستفيدين
+                </p>
+                <div className="flex justify-center items-center">
+                  <p className="text-lg font-bold">0</p>
+                  <p className="text-sm mr-1">مستفيد</p>
+                </div>
+              </div>
+            </div>
               {/* Number of beneficiaries */}
               <div className="p-4">
                 <p className="text-[#7c9364] text-center font-bold mb-2">
@@ -248,9 +274,9 @@ const SinglePage = () => {
             </div>
           </div>
         </div>
-      </div>
     </>
   );
 };
 
 export default SinglePage;
+  
