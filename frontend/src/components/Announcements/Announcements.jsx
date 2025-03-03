@@ -4,6 +4,8 @@ import { FaHandHoldingUsd, FaHandshake } from "react-icons/fa";
 import { MdOutlineVolunteerActivism } from "react-icons/md";
 import { GiOpenBook } from "react-icons/gi";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const buttons = [
   {
@@ -110,9 +112,39 @@ const Announcements = () => {
 
   return (
     <div
-      className="p-6 w-full flex-col flex items-center justify-center bg-gray-100"
+      className=" w-full flex-col flex items-center justify-center bg-gray-100"
       dir="rtl"
     >
+     <section className="bg-[#dfe8df] mb-5 py-16 px-6 w-full text-center">
+      <motion.h2 
+        className="text-3xl font-bold text-gray-800 mb-4"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        أبطال العطاء! 🏆 
+      </motion.h2>
+      <motion.p 
+        className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+      >
+        تعرف على الأشخاص الرائعين الذين ساهموا في تغيير حياة المحتاجين. كل تبرع يحدث فرقًا حقيقيًا!
+      </motion.p>
+      <motion.div 
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Link to="/top-donations">
+          <button className="bg-[#AAB99A] text-white px-6 py-3 text-lg font-semibold rounded-full hover:cursor-pointer shadow-md hover:bg-[#727D73] transition">
+            استكشف المتبرعين المميزين
+          </button>
+        </Link>
+      </motion.div>
+    </section>
+
       <div className="flex w-full justify-around space-x-6 rtl:space-x-reverse p-4">
         {buttons.map((btn, index) => (
           <button
