@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate
+import { useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setDonationAmount } from "../../redux/donationSlice";
+import { Link } from "react-router-dom";
 
 const SinglePage = () => {
   const [cardData, setCardData] = useState(null);
@@ -11,25 +12,9 @@ const SinglePage = () => {
   const [amount, setAmount] = useState("");
 
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleDonation = () => {
-    if (!amount) {
-      alert("يرجى إدخال مبلغ التبرع");
-      return;
-    }
-
-    // Dispatch المبلغ إلى Redux أو إجراء أي منطق آخر
     dispatch(setDonationAmount(amount));
-
-    // Navigate to the payment page with the id and amount as state
-    navigate(`/payment`, {
-      state: {
-        id: cardId,
-        amount: amount,
-      },
-    });
-
     console.log("تم التبرع بالمبلغ:", amount);
   };
 
@@ -38,6 +23,7 @@ const SinglePage = () => {
   };
 
   const params = useParams();
+
   const getIdFromUrl = () => {
     const path = window.location.pathname;
     const pathSegments = path.split("/");
@@ -102,19 +88,16 @@ const SinglePage = () => {
     return <div className="text-center py-6">لم يتم العثور على البطاقة</div>;
 
   return (
-    <>
-      <div className="p-4 flex-wrap gap-10 flex my-20 flex-row-reverse">
-        <div className="font-sans text-right" dir="rtl">
-          {/* Main card */}
-          <div className="rounded-lg h-[550px] flex flex-col justify-between overflow-hidden shadow-md">
+    <div className="container mx-auto p-4 my-5 md:my-20">
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Donation Card Section */}
+        <div className="w-full md:w-1/2 font-sans text-right" dir="rtl">
+          <div className="rounded-lg h-auto flex flex-col justify-between overflow-hidden shadow-md">
             {/* Teal background with decorative leaves */}
             <div className="bg-[#AAB99A] h-[200px] relative">
               {/* White card */}
               <div className="bg-white h-[150px] m-6 items-center flex justify-center rounded-lg p-4 text-center shadow-sm">
-                <p className=" text-2xl">
-                  محتاجة عمرها {cardData.id} عاماً أرملة، بحاجة إلى مسكن يمنحها
-                  الاستقرار، تبقى على توفيره لها {cardData.total_debt} ريال
-                </p>
+                <p className="text-2xl">{cardData.reason}</p>
               </div>
               <div className="h-4 bg-[#D0DDD0] relative">
                 <div className="h-full bg-[#727D73] absolute right-0 w-1/5"></div>
@@ -124,13 +107,13 @@ const SinglePage = () => {
               </div>
             </div>
 
-            {/* Progress bar */}
-
             {/* Case number */}
             <div className="bg-gray-50 p-4 flex justify-between items-center">
               <div className="flex items-center">
                 <p className="text-lg font-bold">رقم الحالة:</p>
-                <p className="text-lg mr-2">{cardData.id}</p>
+                <p className="text-lg mr-2">
+                  {cardData.id + Math.random().toString().slice(2, 12)}
+                </p>
               </div>
             </div>
 
@@ -145,7 +128,9 @@ const SinglePage = () => {
                   <p className="text-xs mr-1 font-bold px-2 py-1 rounded">
                     د.أ
                   </p>
-                  <p className="text-lg font-bold">{cardData.remaining_debt}</p>
+                  <p className="text-lg font-bold">
+                    {Number(cardData.remaining_debt).toFixed()}
+                  </p>
                 </div>
               </div>
 
@@ -180,9 +165,15 @@ const SinglePage = () => {
             <div className="grid grid-cols-2 border-t border-gray-200">
               <div className="p-4 border-l border-gray-200">
                 <p className="text-[#7c9364] text-center font-bold mb-2">
-                  سبب الدين
+                  تم سد من الدين
                 </p>
-                <p className="text-center font-bold">{cardData.reason}</p>
+                <p className="text-center font-bold">
+                  %{" "}
+                  {(
+                    (cardData.remaining_debt / cardData.total_debt) *
+                    100
+                  ).toFixed()}
+                </p>
               </div>
 
               <div className="p-4">
@@ -195,7 +186,8 @@ const SinglePage = () => {
           </div>
         </div>
 
-        <div className="p-6 bg-white rounded-xl shadow-sm w-xl flex flex-col justify-around mx-auto">
+        {/* Donation Form Section */}
+        <div className="w-full md:w-1/2 p-6 bg-white rounded-xl shadow-sm flex flex-col justify-around">
           <div className="flex justify-end mb-4">
             <h2 className="text-lg font-bold text-gray-800">مبلغ التبرع</h2>
           </div>
@@ -205,19 +197,19 @@ const SinglePage = () => {
               onClick={() => handleAmountClick("100")}
               className="py-2 px-4 border border-gray-300 rounded-md text-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#69844c]"
             >
-              <span className="text-[#69844c]">١٠٠ ريال</span>
+              <span className="text-[#69844c]">١٠٠ دينار</span>
             </button>
             <button
               onClick={() => handleAmountClick("50")}
               className="py-2 px-4 border border-gray-300 rounded-md text-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#69844c]"
             >
-              <span className="text-[#69844c]">٥٠ ريال</span>
+              <span className="text-[#69844c]">٥٠ دينار</span>
             </button>
             <button
               onClick={() => handleAmountClick("10")}
               className="py-2 px-4 border border-gray-300 rounded-md text-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#69844c]"
             >
-              <span className="text-[#69844c]">١٠ ريال</span>
+              <span className="text-[#69844c]">١٠ دينار</span>
             </button>
           </div>
 
@@ -236,18 +228,18 @@ const SinglePage = () => {
               تبرع عن أهلك أو أصدقائك وشاركهم الأجر
             </label>
           </div>
-
-          <button
-            onClick={handleDonation}
-            className="w-full bg-[#8da474] hover:bg-[#7c9364] text-white font-medium py-2 px-4 rounded-md transition duration-200"
-          >
-            تبرع الآن
-          </button>
+          <Link to={"/payment"}>
+            <button
+              onClick={handleDonation}
+              className="w-full bg-[#8da474] hover:cursor-pointer hover:bg-[#7c9364] text-white font-medium py-2 px-4 rounded-md transition duration-200"
+            >
+              تبرع الآن
+            </button>
+          </Link>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
 export default SinglePage;
-  
