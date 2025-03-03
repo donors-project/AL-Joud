@@ -145,7 +145,7 @@ const Announcements = () => {
       </motion.div>
     </section>
 
-      <div className="flex w-full justify-around space-x-6 rtl:space-x-reverse p-4">
+      <div className="flex flex-wrap gap-5 justify-center items-center w-full md:justify-around space-x-6 rtl:space-x-reverse p-4">
         {buttons.map((btn, index) => (
           <button
             key={index}

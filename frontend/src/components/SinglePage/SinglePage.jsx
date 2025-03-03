@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { useDispatch } from "react-redux"; // استيراد الـ dispatch
-import { setDonationAmount } from "../../redux/donationSlice"; // تأكد من مسار الـ slice
+import { useDispatch } from "react-redux";
+import { setDonationAmount } from "../../redux/donationSlice";
 import { Link } from "react-router-dom";
 
 const SinglePage = () => {
@@ -11,13 +11,10 @@ const SinglePage = () => {
   const [error, setError] = useState(null);
   const [amount, setAmount] = useState("");
 
-  const dispatch = useDispatch(); // تعريف الـ dispatch
+  const dispatch = useDispatch();
 
   const handleDonation = () => {
-    // Dispatch المبلغ إلى Redux أو إجراء أي منطق آخر
     dispatch(setDonationAmount(amount));
-
-    // يمكنك أيضاً إضافة منطق آخر مثل إرسال البيانات إلى API
     console.log("تم التبرع بالمبلغ:", amount);
   };
 
@@ -25,17 +22,14 @@ const SinglePage = () => {
     setAmount(value);
   };
 
-  // Method 1: Using useParams if you're using React Router
   const params = useParams();
 
-  // Method 2: Extract ID from the URL manually
   const getIdFromUrl = () => {
     const path = window.location.pathname;
     const pathSegments = path.split("/");
     return pathSegments[pathSegments.length - 1];
   };
 
-  // Use either the route param or extract from URL
   const cardId = params?.id || getIdFromUrl();
 
   useEffect(() => {
@@ -44,7 +38,6 @@ const SinglePage = () => {
         setLoading(true);
         console.log("Fetching data for ID:", cardId);
 
-        // Fetch data from API
         const response = await axios.get("http://localhost:5000/api/BFY");
 
         if (!response.data || !Array.isArray(response.data)) {
@@ -53,8 +46,6 @@ const SinglePage = () => {
 
         console.log("API Response:", response.data);
 
-        // Try both string and number comparison
-        // Some APIs return IDs as numbers, while URL params are strings
         const foundCard = response.data.find(
           (card) =>
             String(card.id) === String(cardId) ||
@@ -86,7 +77,6 @@ const SinglePage = () => {
     }
   }, [cardId]);
 
-  // لطباعة البيانات الكاملة للتصحيح
   useEffect(() => {
     console.log("Current card data:", cardData);
   }, [cardData]);
@@ -98,67 +88,16 @@ const SinglePage = () => {
     return <div className="text-center py-6">لم يتم العثور على البطاقة</div>;
 
   return (
-    <>
-      <div className="p-4 flex-wrap justify-center gap-10 flex my-20">
-        <div className="p-6 bg-white rounded-xl shadow-sm w-[40%] flex flex-col justify-around mx-auto">
-          <div className="flex justify-end mb-4">
-            <h2 className="text-lg font-bold text-gray-800">مبلغ التبرع</h2>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 mb-4 rtl">
-            <button
-              onClick={() => handleAmountClick("100")}
-              className="py-2 px-4 border border-gray-300 rounded-md text-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#69844c]"
-            >
-              <span className="text-[#69844c]">١٠٠ دينار</span>
-            </button>
-            <button
-              onClick={() => handleAmountClick("50")}
-              className="py-2 px-4 border border-gray-300 rounded-md text-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#69844c]"
-            >
-              <span className="text-[#69844c]">٥٠ دينار</span>
-            </button>
-            <button
-              onClick={() => handleAmountClick("10")}
-              className="py-2 px-4 border border-gray-300 rounded-md text-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#69844c]"
-            >
-              <span className="text-[#69844c]">١٠ دينار</span>
-            </button>
-          </div>
-
-          <div className="mb-4">
-            <input
-              type="text"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md text-right"
-              placeholder="قيمة المبلغ"
-            />
-          </div>
-
-          <div className="flex items-center justify-end gap-2 mb-4">
-            <label className="text-gray-700 text-[20px]">
-              تبرع عن أهلك أو أصدقائك وشاركهم الأجر
-            </label>
-          </div>
-          <Link to={"/payment"}>
-            <button
-              onClick={handleDonation}
-              className="w-full bg-[#8da474] hover:cursor-pointer hover:bg-[#7c9364] text-white font-medium py-2 px-4 rounded-md transition duration-200"
-            >
-              تبرع الآن
-            </button>
-          </Link>
-        </div>
-
-        <div className="font-sans w-[55%] text-right" dir="rtl">
-          {/* Main card */}
-          <div className="rounded-lg h-[550px] flex flex-col justify-between overflow-hidden shadow-md">
+    <div className="container mx-auto p-4 my-5 md:my-20">
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Donation Card Section */}
+        <div className="w-full md:w-1/2 font-sans text-right" dir="rtl">
+          <div className="rounded-lg h-auto flex flex-col justify-between overflow-hidden shadow-md">
             {/* Teal background with decorative leaves */}
             <div className="bg-[#AAB99A] h-[200px] relative">
               {/* White card */}
               <div className="bg-white h-[150px] m-6 items-center flex justify-center rounded-lg p-4 text-center shadow-sm">
-                <p className=" text-2xl">{cardData.reason}</p>
+                <p className="text-2xl">{cardData.reason}</p>
               </div>
               <div className="h-4 bg-[#D0DDD0] relative">
                 <div className="h-full bg-[#727D73] absolute right-0 w-1/5"></div>
@@ -246,8 +185,60 @@ const SinglePage = () => {
             </div>
           </div>
         </div>
+
+        {/* Donation Form Section */}
+        <div className="w-full md:w-1/2 p-6 bg-white rounded-xl shadow-sm flex flex-col justify-around">
+          <div className="flex justify-end mb-4">
+            <h2 className="text-lg font-bold text-gray-800">مبلغ التبرع</h2>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 mb-4 rtl">
+            <button
+              onClick={() => handleAmountClick("100")}
+              className="py-2 px-4 border border-gray-300 rounded-md text-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#69844c]"
+            >
+              <span className="text-[#69844c]">١٠٠ دينار</span>
+            </button>
+            <button
+              onClick={() => handleAmountClick("50")}
+              className="py-2 px-4 border border-gray-300 rounded-md text-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#69844c]"
+            >
+              <span className="text-[#69844c]">٥٠ دينار</span>
+            </button>
+            <button
+              onClick={() => handleAmountClick("10")}
+              className="py-2 px-4 border border-gray-300 rounded-md text-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#69844c]"
+            >
+              <span className="text-[#69844c]">١٠ دينار</span>
+            </button>
+          </div>
+
+          <div className="mb-4">
+            <input
+              type="text"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md text-right"
+              placeholder="قيمة المبلغ"
+            />
+          </div>
+
+          <div className="flex items-center justify-end gap-2 mb-4">
+            <label className="text-gray-700 text-[20px]">
+              تبرع عن أهلك أو أصدقائك وشاركهم الأجر
+            </label>
+          </div>
+          <Link to={"/payment"}>
+            <button
+              onClick={handleDonation}
+              className="w-full bg-[#8da474] hover:cursor-pointer hover:bg-[#7c9364] text-white font-medium py-2 px-4 rounded-md transition duration-200"
+            >
+              تبرع الآن
+            </button>
+          </Link>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 
